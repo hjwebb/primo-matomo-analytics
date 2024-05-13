@@ -1,16 +1,26 @@
+/*matomo code */
+	
 angular.module('matomoAnalytics', []);
 angular.module('matomoAnalytics').run(function ($rootScope, $interval, analyticsOptions) {
 	if(analyticsOptions.hasOwnProperty("enabled") && analyticsOptions.enabled) {
 		if(analyticsOptions.hasOwnProperty("siteId") && analyticsOptions.siteId != '' && analyticsOptions.hasOwnProperty("siteUrl") && analyticsOptions.siteUrl != '') {
 			if(typeof _paq === 'undefined') {
 				window['_paq'] = [];
-				_paq.push(["setDomains", ["*.csudh-primo.hosted.exlibrisgroup.com/"]]);
+				/* add all the domains you are tracking as cross domain linking for your site, for example
+				_paq.push(["setDomains", ["*.library.upstate.edu","*.guides.upstate.edu""]]);
+				*/
+				_paq.push(["setDomains", ["domain","domain"]]);
+				_paq.push(["enableCrossDomainLinking"]);
+				_paq.push(['setCookieSameSite', "None"]);
+				_paq.push(['enableLinkTracking']);
+				/* the following line tracks the View It section links as outlinks */
+				_paq.push(['setLinkClasses', "item-title md-primoExplore-theme"]);
 				_paq.push(["setDoNotTrack", true]);
 				(function() {
-					_paq.push(['setTrackerUrl', analyticsOptions.siteUrl+'piwik.php']);
+					_paq.push(['setTrackerUrl', analyticsOptions.siteUrl+'matomo.php']);
 					_paq.push(['setSiteId', analyticsOptions.siteId]);
 					var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-					g.type='text/javascript'; g.async=true; g.defer=true; g.src=analyticsOptions.siteUrl+'piwik.js'; s.parentNode.insertBefore(g,s);
+					g.type='text/javascript'; g.async=true; g.defer=true; g.src=analyticsOptions.siteUrl+'matomo.js'; s.parentNode.insertBefore(g,s);
 				})();
 			}
 		}
@@ -22,14 +32,13 @@ angular.module('matomoAnalytics').run(function ($rootScope, $interval, analytics
 					if(document.title !== '') documentTitle = document.title;
 					if (window.location.pathname.indexOf('openurl') !== -1 || window.location.pathname.indexOf('fulldisplay') !== -1)
 						if (angular.element(document.querySelector('prm-full-view-service-container .item-title>a')).length === 0) return;
-						else documentTitle = angular.element(document.querySelector('prm-full-view-service-container .item-title>a')).text();
-					
+						/* the following line adds the word Discovery in front of the item title, change if you want a different work or remove for no additional words */
+						else documentTitle = 'Discovery'+angular.element(document.querySelector('prm-full-view-service-container .item-title>a')).text();
+					  
 					if(typeof _paq !== 'undefined') {
 						if(fromState != toState) _paq.push(['setReferrerUrl', fromState]);
 						_paq.push(['setCustomUrl', toState]);
 						_paq.push(['setDocumentTitle', documentTitle]);
-						_paq.push(['setGenerationTimeMs', Date.now()-timerStart]);
-						_paq.push(['enableLinkTracking']);
 						_paq.push(['enableHeartBeatTimer']);
 						_paq.push(['trackPageView']);
 					}
@@ -39,9 +48,12 @@ angular.module('matomoAnalytics').run(function ($rootScope, $interval, analytics
 		});
 	}
 });
+
+/* custom siteId, siteUrl from matomo and a default page title */
 angular.module('matomoAnalytics').value('analyticsOptions', {
     enabled: true,
-	siteId: '',
-	siteUrl: '',
-	defaultTitle: ''
-});
+	siteId: '1',
+	siteUrl: '//hsl.upstate.edu/analytics/',
+	defaultTitle: 'Upstate Library Discovery Search'
+});	
+	/*end matomo code */
